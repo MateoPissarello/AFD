@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
 { 
     // Automata por defecto   
     if (argc == 1) {
-        AFDmanual();
+        AFDomision();
     }
     
     if (argc == 2 && (strcmp(argv[1], "-m") == 0 || strcmp(argv[1], "-M") == 0)) {

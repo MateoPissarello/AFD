@@ -20,8 +20,8 @@ int AFDomision() {
     FILE *archivo = NULL;
     FILE *archCadenas = NULL;
 
-    archivo = fopen(fileName, "rt");
-    archCadenas = fopen(stringsFileName, "rt");
+    archivo = fopen(fileName, "r");
+    archCadenas = fopen(stringsFileName, "r");
     if (archivo == NULL || archCadenas == NULL) {
         printf("Error al abrir los archivos.\n");
         return 1;
@@ -30,7 +30,8 @@ int AFDomision() {
     int i, j, n; 
     leers(symbols);   
     n = strlen(symbols);
-    fl(i,0,n) {
+ 
+     fl(i,0,n) {
         symdir[i] = (int) symbols[i];
     }  
 
