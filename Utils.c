@@ -40,7 +40,7 @@ void guardar_estados_de_aceptacion(char *buffer, int *states, int *states_of_acc
     }
 }
 
-void guardar_en_matriz_de_transicion(char *buffer, int *states, int *alphabet, int **matrix_of_transitions){
+void guardar_en_matriz_de_transicion(char *buffer, int *states, int *alphabet, int matrix_of_transitions[127][127]){
     int first_state = (int) buffer[0];
     int destination_state = (int) buffer[2];
     int symbol = (int) buffer[1];
@@ -56,12 +56,25 @@ void guardar_en_matriz_de_transicion(char *buffer, int *states, int *alphabet, i
         exit(1);
     }
 }
+void check_str(char *chain, int *initial_state, int *states_of_acceptance, int matrix_of_transitions[127][127]){
+    int curr = *initial_state;
+    int limit = strlen(chain);
+    int i;
+    for(i,0,limit){
+        int c = (int) chain[i];
+        curr = matrix_of_transitions[curr][c];
+    }
+    if (states_of_acceptance[curr] == 1){
+        printf("Resultado: La cadena fue aceptada.\n");
+    } else {
+        printf("Resultado: La cadena fue rechazada.\n");
+}
+}
 int DefaultAFD()
 {
-    int alphabet[127], initial_state, mark[20], mat[20][127];
+    int alphabet[127], initial_state;
     int states_of_acceptance[127];
     int  matrix_of_transitions[127][127];
-    char symbols[50];
     int states[127];
     char cadena[256];
     char fileName[256];
@@ -118,12 +131,20 @@ int DefaultAFD()
         else
         {
             printf("Matriz de transicion de estados: %s\n", buffer);
-            // guardar_en_matriz_de_transicion(buffer, states, alphabet, matrix_of_transitions);
+            guardar_en_matriz_de_transicion(buffer, states, alphabet, matrix_of_transitions);
         }
         contador++;
     }
 
     fclose(archivo);
+    
+    printf("Ingrese la cadena a evaluar: ");
+    scan_str(cadena);
+    while(strlen(cadena) > 0){
+        check_str(cadena, &initial_state, states_of_acceptance, matrix_of_transitions);
+        printf("Ingrese la cadena a evaluar: ");
+        scan_str(cadena);
+    }
 
     // archivo = fopen(fileName, "r");
     // archCadenas = fopen(stringsFileName, "r");

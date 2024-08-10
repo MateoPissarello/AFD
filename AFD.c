@@ -3,13 +3,6 @@
 #include <string.h>
 #include "FAFD.h"
 
-#define for(i, a, b) for (i = a; i < b; i++)
-#define scan(a) scanf("%d", &a)
-#define leer_num_archivo(nombre_archivo, a) fscanf(archivo, "%d", &a)
-// #define leer_str_archivo(nombre_archivo, a) fscanf(archivo, "%s", a)
-#define leerc(a) fgets(a, 1000, archCadenas)
-#define line_break printf("\n")
-
 int main(int argc, char *argv[])
 {
     // Automata por defecto
