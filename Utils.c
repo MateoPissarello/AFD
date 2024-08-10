@@ -1,48 +1,129 @@
 #include <stdio.h>
+
 #include <string.h>
+
 #include <stdlib.h>
+
 #include "FAFD.h"
 
 const char tests_folder[256] = "tests/";
 
 
-// Función para leer todo el contenido del archivo en un buffer
-void leer_str_archivo(const char *path, char *buffer, size_t bufferSize) {
-    FILE *archivo = fopen(path, "r");
-    if (archivo == NULL) {
-        printf("Error al abrir el archivo.\n");
-        exit(1);
+void buffer_a_arr(char *buffer, int *arr){
+    int i;
+    for(i,0,strlen(buffer)){
+        int c = (int) buffer[i];
+        arr[c] = 1;
     }
-    // Leer el contenido del archivo línea por línea
-    while (fgets(buffer, bufferSize, archivo) != NULL) {
-        // Elimina el salto de línea si existe
-        size_t len = strlen(buffer);
-        if (len > 0 && buffer[len - 1] == '\n') {
-            buffer[len - 1] = '\0';
-        }
-        // Procesar el contenido de la línea
-        printf("Línea leída: %s\n", buffer);
-    }
-
-    fclose(archivo);
 }
 
-int DefaultAFD() {
-    int alphabet[20], initial_state, states_of_acceptance, mark[20], mat[20][127];
-    char symbols[50]; 
-    char states[50];
-    char cadena[256];  
+void guardar_estado_inicial(char *buffer, int *states, int *initial_state){
+    int c = (int) buffer[0];
+    if (states[c] == 1){
+        *initial_state = c;
+    } else {
+        printf("\033[0;31mError: El estado inicial no es valido, revise el archivo.\033[0m\n");
+        exit(1);
+    }
+}
+
+void guardar_estados_de_aceptacion(char *buffer, int *states, int *states_of_acceptance){
+    int i;
+    for(i,0,strlen(buffer)){
+        int c = (int) buffer[i];
+        if (states[c] == 1){
+            states_of_acceptance[c] = 1;
+        } else {
+            printf("\033[0;31mError: El estado de aceptacion no es valido, revise el archivo.\033[0m\n");
+            exit(1);
+        }
+    }
+}
+
+void guardar_en_matriz_de_transicion(char *buffer, int *states, int *alphabet, int **matrix_of_transitions){
+    int first_state = (int) buffer[0];
+    int destination_state = (int) buffer[2];
+    int symbol = (int) buffer[1];
+    if (states[first_state] == 1 && states[destination_state] == 1){
+        if (alphabet[symbol] == 1){
+            matrix_of_transitions[first_state][symbol] = destination_state;
+        } else {
+            printf("\033[0;31mError: El simbolo no es valido, revise el archivo.\033[0m\n");
+            exit(1);
+        }
+    } else {
+        printf("\033[0;31mError: Los estados no son validos, revise el archivo.\033[0m\n");
+        exit(1);
+    }
+}
+int DefaultAFD()
+{
+    int alphabet[127], initial_state, mark[20], mat[20][127];
+    int states_of_acceptance[127];
+    int  matrix_of_transitions[127][127];
+    char symbols[50];
+    int states[127];
+    char cadena[256];
     char fileName[256];
     char stringsFileName[256];
     char path[50];
+    char buffer[50];
+
+
 
     // FILE *archCadenas = NULL;
     printf("Ingrese el nombre del archivo de configuracion (debe estar ubicado en la carpeta %s): ", tests_folder);
     scan_str(fileName);
-    // char *path = strcat(tests_folder, fileName);
     sprintf(path, "%s%s", tests_folder, fileName);
-    leer_str_archivo(path, states, sizeof(states));
-    int i,j,n;
+    // leer_str_archivo(path, states, sizeof(states));
+    FILE *archivo = fopen(path, "r");
+    if (archivo == NULL)
+    {
+        printf("Error al abrir el archivo.\n");
+        exit(1);
+    }
+    int contador = 1;
+    // Leer el contenido del archivo línea por línea
+    while (fgets(buffer, sizeof(buffer), archivo) != NULL) 
+    {
+        printf("Contador: %d\n", contador);
+        // Elimina el salto de línea si existe
+        size_t len = strlen(buffer);
+        if (len > 0 && buffer[len - 1] == '\n')
+        {
+            buffer[len - 1] = '\0';
+        }
+        // Procesar el contenido de la línea
+        if (contador == 1)
+        { 
+            printf("Estados: %s\n", buffer);
+            buffer_a_arr(buffer, states);
+        }
+        else if (contador == 2)
+        {
+            printf("Alfabeto: %s\n", buffer);
+            buffer_a_arr(buffer, alphabet);
+        }
+        else if (contador == 3)
+        {
+            printf("Estado inicial: %s\n", buffer);
+            guardar_estado_inicial(buffer, states, &initial_state);
+            
+        }
+        else if (contador == 4)
+        {
+            printf("Estados de aceptacion: %s\n", buffer);
+            guardar_estados_de_aceptacion(buffer, states, states_of_acceptance);
+        }
+        else
+        {
+            printf("Matriz de transicion de estados: %s\n", buffer);
+            // guardar_en_matriz_de_transicion(buffer, states, alphabet, matrix_of_transitions);
+        }
+        contador++;
+    }
+
+    fclose(archivo);
 
     // archivo = fopen(fileName, "r");
     // archCadenas = fopen(stringsFileName, "r");
@@ -51,19 +132,19 @@ int DefaultAFD() {
     //     return 1;
     // }
 
-    // int i, j, n; 
-    // leers(symbols);   
+    // int i, j, n;
+    // leers(symbols);
     // n = strlen(symbols);
- 
+
     //  for(i,0,n) {
     //     symdir[i] = (int) symbols[i];
-    // }  
+    // }
 
     // // Primero leemos del archivo el numero de estados
     // leer(states);
 
     // // Ahora vamos por los estados de aceptación
-    // leer(estados_de_aceptacion); 
+    // leer(estados_de_aceptacion);
 
     // fl(i,0,estados_de_aceptacion) {
     //     int temp;
@@ -100,7 +181,7 @@ int DefaultAFD() {
     //             printf("ERROR! Regla invalida!\n");
     //             break;
     //         }
-    //     } 
+    //     }
 
     //     if (curr != -1) {
     //         if (mark[curr] == 1)
@@ -117,6 +198,7 @@ int DefaultAFD() {
 
     return 0;
 }
+
 
 // int AFDmanual() {
 //     printf("Automata de ingreso manual\n");
