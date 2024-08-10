@@ -1,3 +1,16 @@
+/**
+ * Archivo: Utils.c
+ * 
+ * Descripción: Este archivo contiene funciones de utilidad para el manejo de autómatas finitos deterministas (AFD).
+ * 
+ * Funciones:
+ *  - buffer_a_arr: Convierte los caracteres de un buffer en un arreglo de enteros.
+ *  - guardar_estado_inicial: Verifica y guarda el estado inicial en la variable `initial_state`.
+ *  - guardar_estados_de_aceptacion: Guarda los estados de aceptación en un arreglo de estados de aceptación.
+ *  - guardar_en_matriz_de_transicion: Guarda la transición en la matriz de transiciones.
+ *  - check_str: Verifica si una cadena cumple con los estados de aceptación de un AFD.
+ *  - DefaultAFD: Función principal para ejecutar un AFD por defecto.
+ */
 #include <stdio.h>
 
 #include <string.h>
@@ -6,83 +19,148 @@
 
 #include "FAFD.h"
 
+#define ASCII_DIGITS 127
 const char tests_folder[256] = "tests/";
-
-
-void buffer_a_arr(char *buffer, int *arr){
+/**
+ * Convierte los caracteres de un buffer en un arreglo de enteros.
+ *
+ * @param buffer El buffer que contiene los caracteres a convertir.
+ * @param arr El arreglo de enteros donde se almacenarán los resultados.
+ */
+void buffer_a_arr(char *buffer, int *arr)
+{
     int i;
-    for(i,0,strlen(buffer)){
-        int c = (int) buffer[i];
+    for (i, 0, strlen(buffer))
+    {
+        int c = (int)buffer[i];
         arr[c] = 1;
     }
 }
 
-void guardar_estado_inicial(char *buffer, int *states, int *initial_state){
-    int c = (int) buffer[0];
-    if (states[c] == 1){
+/**
+ * Función para guardar el estado inicial.
+ *
+ * Esta función verifica si el estado inicial es válido y lo guarda en la variable `initial_state`.
+ *
+ * @param buffer El buffer que contiene los datos.
+ * @param states Un arreglo que representa los estados.
+ * @param initial_state Un puntero a la variable donde se guardará el estado inicial.
+ */
+void guardar_estado_inicial(char *buffer, int *states, int *initial_state)
+{
+    int c = (int)buffer[0];
+    if (states[c] == 1)
+    {
         *initial_state = c;
-    } else {
+    }
+    else
+    {
         printf("\033[0;31mError: El estado inicial no es valido, revise el archivo.\033[0m\n");
         exit(1);
     }
 }
 
-void guardar_estados_de_aceptacion(char *buffer, int *states, int *states_of_acceptance){
+/**
+ * Guarda los estados de aceptación en un arreglo de estados de aceptación.
+ *
+ * @param buffer El buffer que contiene los estados de aceptación.
+ * @param states El arreglo de estados.
+ * @param states_of_acceptance El arreglo de estados de aceptación.
+ */
+void guardar_estados_de_aceptacion(char *buffer, int *states, int *states_of_acceptance)
+{
     int i;
-    for(i,0,strlen(buffer)){
-        int c = (int) buffer[i];
-        if (states[c] == 1){
+    for (i, 0, strlen(buffer))
+    {
+        int c = (int)buffer[i];
+        if (states[c] == 1)
+        {
             states_of_acceptance[c] = 1;
-        } else {
+        }
+        else
+        {
             printf("\033[0;31mError: El estado de aceptacion no es valido, revise el archivo.\033[0m\n");
             exit(1);
         }
     }
 }
 
-void guardar_en_matriz_de_transicion(char *buffer, int *states, int *alphabet, int matrix_of_transitions[127][127]){
-    int first_state = (int) buffer[0];
-    int destination_state = (int) buffer[2];
-    int symbol = (int) buffer[1];
-    if (states[first_state] == 1 && states[destination_state] == 1){
-        if (alphabet[symbol] == 1){
+/**
+ * Guarda la transición en la matriz de transiciones.
+ *
+ * @param buffer El buffer que contiene la información de la transición.
+ * @param states Un arreglo que indica si un estado es válido o no.
+ * @param alphabet Un arreglo que indica si un símbolo es válido o no.
+ * @param matrix_of_transitions La matriz de transiciones.
+ */
+void guardar_en_matriz_de_transicion(char *buffer, int *states, int *alphabet, int matrix_of_transitions[127][127])
+{
+    int first_state = (int)buffer[0];
+    int destination_state = (int)buffer[2];
+    int symbol = (int)buffer[1];
+    if (states[first_state] == 1 && states[destination_state] == 1)
+    {
+        if (alphabet[symbol] == 1)
+        {
             matrix_of_transitions[first_state][symbol] = destination_state;
-        } else {
+        }
+        else
+        {
             printf("\033[0;31mError: El simbolo no es valido, revise el archivo.\033[0m\n");
             exit(1);
         }
-    } else {
+    }
+    else
+    {
         printf("\033[0;31mError: Los estados no son validos, revise el archivo.\033[0m\n");
         exit(1);
     }
 }
-void check_str(char *chain, int *initial_state, int *states_of_acceptance, int matrix_of_transitions[127][127]){
+
+/**
+ * Verifica si una cadena cumple con los estados de aceptación de un autómata finito determinista (AFD).
+ *
+ * @param chain La cadena a verificar.
+ * @param initial_state El estado inicial del AFD.
+ * @param states_of_acceptance Los estados de aceptación del AFD.
+ * @param matrix_of_transitions La matriz de transiciones del AFD.
+ */
+void check_str(char *chain, int *initial_state, int *states_of_acceptance, int matrix_of_transitions[127][127])
+{
     int curr = *initial_state;
     int limit = strlen(chain);
     int i;
-    for(i,0,limit){
-        int c = (int) chain[i];
+    for (i, 0, limit)
+    {
+        int c = (int)chain[i];
         curr = matrix_of_transitions[curr][c];
     }
-    if (states_of_acceptance[curr] == 1){
+    if (states_of_acceptance[curr] == 1)
+    {
         printf("Resultado: La cadena fue aceptada.\n");
-    } else {
+    }
+    else
+    {
         printf("Resultado: La cadena fue rechazada.\n");
+    }
 }
-}
+/**
+ * Función para ejecutar un Autómata Finito Determinista (AFD) por defecto.
+ * Lee un archivo de configuración que contiene la información necesaria para construir el AFD,
+ * y luego permite ingresar cadenas para evaluar si son aceptadas por el AFD.
+ *
+ * @return 0 si la ejecución fue exitosa.
+ */
 int DefaultAFD()
 {
-    int alphabet[127], initial_state;
-    int states_of_acceptance[127];
-    int  matrix_of_transitions[127][127];
-    int states[127];
+    int alphabet[ASCII_DIGITS], initial_state;
+    int states_of_acceptance[ASCII_DIGITS]; 
+    int matrix_of_transitions[ASCII_DIGITS][ASCII_DIGITS];
+    int states[ASCII_DIGITS];
     char cadena[256];
     char fileName[256];
-    char stringsFileName[256];
     char path[50];
     char buffer[50];
-
-
 
     // FILE *archCadenas = NULL;
     printf("Ingrese el nombre del archivo de configuracion (debe estar ubicado en la carpeta %s): ", tests_folder);
@@ -97,9 +175,8 @@ int DefaultAFD()
     }
     int contador = 1;
     // Leer el contenido del archivo línea por línea
-    while (fgets(buffer, sizeof(buffer), archivo) != NULL) 
+    while (fgets(buffer, sizeof(buffer), archivo) != NULL)
     {
-        printf("Contador: %d\n", contador);
         // Elimina el salto de línea si existe
         size_t len = strlen(buffer);
         if (len > 0 && buffer[len - 1] == '\n')
@@ -108,199 +185,38 @@ int DefaultAFD()
         }
         // Procesar el contenido de la línea
         if (contador == 1)
-        { 
-            printf("Estados: %s\n", buffer);
+        {
             buffer_a_arr(buffer, states);
         }
         else if (contador == 2)
         {
-            printf("Alfabeto: %s\n", buffer);
             buffer_a_arr(buffer, alphabet);
         }
         else if (contador == 3)
         {
-            printf("Estado inicial: %s\n", buffer);
             guardar_estado_inicial(buffer, states, &initial_state);
-            
         }
         else if (contador == 4)
         {
-            printf("Estados de aceptacion: %s\n", buffer);
             guardar_estados_de_aceptacion(buffer, states, states_of_acceptance);
         }
         else
         {
-            printf("Matriz de transicion de estados: %s\n", buffer);
             guardar_en_matriz_de_transicion(buffer, states, alphabet, matrix_of_transitions);
         }
         contador++;
     }
 
     fclose(archivo);
-    
     printf("Ingrese la cadena a evaluar: ");
     scan_str(cadena);
-    while(strlen(cadena) > 0){
+    while (strlen(cadena) != 0)
+    {
+        printf("%s\n", cadena);
         check_str(cadena, &initial_state, states_of_acceptance, matrix_of_transitions);
+
         printf("Ingrese la cadena a evaluar: ");
         scan_str(cadena);
     }
-
-    // archivo = fopen(fileName, "r");
-    // archCadenas = fopen(stringsFileName, "r");
-    // if (archivo == NULL || archCadenas == NULL) {
-    //     printf("Error al abrir los archivos.\n");
-    //     return 1;
-    // }
-
-    // int i, j, n;
-    // leers(symbols);
-    // n = strlen(symbols);
-
-    //  for(i,0,n) {
-    //     symdir[i] = (int) symbols[i];
-    // }
-
-    // // Primero leemos del archivo el numero de estados
-    // leer(states);
-
-    // // Ahora vamos por los estados de aceptación
-    // leer(estados_de_aceptacion);
-
-    // fl(i,0,estados_de_aceptacion) {
-    //     int temp;
-    //     leer(temp);
-    //     mark[temp] = 1;
-    // }
-
-    // // Defina Delta
-    // fl(i,0,states) {
-    //     fl(j,0,n) {
-    //         leer(mat[i][symdir[j]]);
-    //         //printf("%d -> %c -> %d\n", i, symdir[j], mat[i][symdir[j]]);
-    //     }
-    // }
-
-    // //--------------------------------------------------------//
-
-    // char str1[MAX];
-    // while (leerc(str1) != NULL) {
-    //     int curr = 0;
-    //     int limit = strlen(str1) - 1;
-
-    //     fl(i,0,limit) {
-    //         if (strchr(symbols, str1[i]) == NULL) {
-    //             printf("ERROR! En la cadena %s, %c no es un elemento del alfabeto\n", str1, str1[i]);
-    //             curr = -1;
-    //             break;
-    //         }
-
-    //         int ele = (int)(str1[i]);
-    //         curr = mat[curr][ele];
-
-    //         if (curr == -1) {
-    //             printf("ERROR! Regla invalida!\n");
-    //             break;
-    //         }
-    //     }
-
-    //     if (curr != -1) {
-    //         if (mark[curr] == 1)
-    //             printf("La cadena %s es ACEPTADA\n", str1);
-    //         else
-    //             printf("La cadena %s es RECHAZADA\n", str1);
-
-    //         nline;
-    //     }
-    // }
-
-    // fclose(archivo);
-    // fclose(archCadenas);
-
     return 0;
 }
-
-
-// int AFDmanual() {
-//     printf("Automata de ingreso manual\n");
-
-//     int states, symbols, symdir[20], final_states, mark[20], mat[20][20];
-//     int i, j, k;
-
-//     printf("Ingrese el numero de estados: ");
-//     scan(states);
-
-//     printf("Ingrese el numero de simbolos: ");
-//     scan(symbols);
-//     char A[symbols];
-
-//     printf("Ingrese los simbolos:\n");
-//     nline;
-
-//     fl(i,0,symbols) {
-//         printf("Ingrese el simbolo número %d: ", i);
-//         scanf(" %c", &A[i]);  // Espacio antes de %c para ignorar espacios en blanco
-//         symdir[i] = i;
-//     }
-
-//     printf("Ingrese el numero de estado(s) de aceptacion: ");
-//     scan(final_states);
-
-//     printf("Ingrese el estado de aceptacion: ");
-//     fl(i,0,final_states) {
-//         int temp;
-//         scan(temp);
-//         mark[temp] = 1;
-//     }
-
-//     printf("Defina delta:\n");
-//     nline;
-
-//     fl(i,0,states) {
-//         fl(j,0,symbols) {
-//             printf("Defina la relacion entre el estado delta (%d, %c) = ", i, A[j]);
-//             scan(mat[i][symdir[j]]);
-//         }
-//     }
-
-//     //--------------------------------------------------------//
-
-//     while (1) {
-//         printf("Ingrese las cadenas solución: ");
-//         char str1[MAX];
-//         char str2[MAX];
-
-//         scanf("%s", str1);
-
-//         int limit = strlen(str1);
-//         int limit2 = strlen(A);
-
-//         fl(i,0,limit) {
-//             fl(j,0,limit2) {
-//                 if (str1[i] == A[j]) {
-//                     str2[i] = j;
-//                 }
-//             }
-//         }
-
-//         int curr = 0;
-//         fl(i,0,limit) {
-//             int ele = (int)(str2[i]);
-//             curr = mat[curr][ele];
-//         }
-
-//         if (mark[curr] == 1)
-//             printf("Verdadera\n");
-//         else
-//             printf("Falsa\n");
-
-//         nline;
-//     }
-
-//     return 0;
-// }
-
-// int AFDautomatacadena() {
-//     // Implementar la función según tus necesidades
-//     return 0;
-// }
