@@ -120,7 +120,7 @@ En este caso, el archivo cuenta con 8 líneas. A continuación, se detalla lo qu
         Ir del estado 3 al estado 2 a través de b.
 
 ### Diagramas de configuraciones
-Si es necesario, para tener mas claridad, dentro de la carpeta de **tests**, existe otra llamada **tests_diagrams**, que contiene la representación visual de cada uno de los archivos de configuración.
+Si es necesario, para tener mas claridad, dentro de la carpeta de **tests**, existe otra llamada [**tests_diagrams**](https://github.com/MateoPissarello/AFD/tree/main/tests/tests_diagrams), que contiene la representación visual de cada uno de los archivos de configuración.
 
 ## Relacionado
 
