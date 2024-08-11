@@ -48,7 +48,13 @@ void buffer_a_arr(char *buffer, int *arr)
  */
 void guardar_estado_inicial(char *buffer, int *states, int *initial_state)
 {
+    if (strlen(buffer) != 1)
+    {
+        printf("\033[0;31mError: Solo puede haber un estado inicial, corrija el archivo.\033[0m\n");
+        exit(1);
+    }
     int c = (int)buffer[0];
+
     if (states[c] == 1)
     {
         *initial_state = c;
