@@ -1,8 +1,0 @@
-{
-  "files.associations": {
-    "AFD.C": "cpp",
-    "stdlib.h": "c",
-    "fafd.h": "c",
-    "string.h": "c"
-  }
-}
