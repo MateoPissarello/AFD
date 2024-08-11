@@ -20,7 +20,7 @@
 #include "FAFD.h"
 
 #define ASCII_DIGITS 127
-const char tests_folder[256] = "tests/";
+const char tests_folder[256] = "../tests/";
 /**
  * Convierte los caracteres de un buffer en un arreglo de enteros.
  *
